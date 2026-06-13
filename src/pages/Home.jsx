@@ -13,7 +13,6 @@ import { games, paymentMethods } from '../data/mock';
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -31,7 +30,6 @@ const Home = () => {
   const [playerId, setPlayerId] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
   
-  const [showConfirm, setShowConfirm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const { toast } = useToast();
 
@@ -80,13 +78,8 @@ const Home = () => {
       toast({ title: 'Select payment', description: 'Please choose a payment method.' });
       return;
     }
-    setShowConfirm(true);
+    handleRazorpay();
   };
-
-  const paymentMethod = useMemo(
-    () => paymentMethods.find((p) => p.id === selectedPaymentId),
-    [selectedPaymentId]
-  );
 
   const handleRazorpay = () => {
     const amountINR = getINRPrice(selectedAmount);
@@ -100,7 +93,6 @@ const Home = () => {
       image: "/Garena-Icon-Logo.png",
       description: `${selectedAmount} ${game.pointLabel} Top-up for ${game.id === 'freefire' ? playerId : username}`,
       handler: function (response) {
-        setShowConfirm(false);
         setShowSuccess(true);
       },
       prefill: {
@@ -166,41 +158,6 @@ const Home = () => {
           </div>
         </div>
       </main>
-
-      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <AlertDialogContent className="max-w-[400px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl font-bold border-b pb-2">Order Confirmation</AlertDialogTitle>
-            <AlertDialogDescription className="pt-4 space-y-4 text-gray-900">
-              <div className="flex justify-between items-center pb-2 border-b border-gray-100">
-                <span className="text-gray-500 text-sm">Account ID</span>
-                <span className="font-bold">{game.id === 'freefire' ? playerId : username}</span>
-              </div>
-              <div className="flex justify-between items-center pb-2 border-b border-gray-100">
-                <span className="text-gray-500 text-sm">Product</span>
-                <span className="font-bold">{selectedAmount} {game.pointLabel}</span>
-              </div>
-              <div className="flex justify-between items-center pb-2 border-b border-gray-100">
-                <span className="text-gray-500 text-sm">Payment Method</span>
-                <span className="font-bold">{paymentMethod?.name}</span>
-              </div>
-              <div className="flex justify-between items-center pt-2">
-                <span className="text-gray-900 font-bold">Total Amount</span>
-                <span className="text-[#d92027] text-xl font-extrabold">₹{getINRPrice(selectedAmount)}</span>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="mt-6">
-            <AlertDialogCancel className="h-11 border-gray-200">Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleRazorpay}
-              className="bg-[#d92027] hover:bg-[#b81a20] h-11 px-8 font-bold"
-            >
-              Topup
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
       <AlertDialog open={showSuccess} onOpenChange={setShowSuccess}>
         <AlertDialogContent className="max-w-[400px]">
