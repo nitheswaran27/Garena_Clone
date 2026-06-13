@@ -8,11 +8,8 @@ const AmountStep = ({ game, selectedAmount, onSelect }) => {
   useEffect(() => {
     if (game.id !== 'freefire') return;
 
-    // Target: 3 days, 2 hours, 30 mins from now
-    const targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + 3);
-    targetDate.setHours(targetDate.getHours() + 2);
-    targetDate.setMinutes(targetDate.getMinutes() + 30);
+    // Fixed target date: June 16, 2026, 9:00 PM (3d:2hrs:30m from June 13, 2026, 6:30 PM)
+    const targetDate = new Date('2026-06-16T21:00:00');
 
     const updateTimer = () => {
       const now = new Date();
@@ -26,12 +23,13 @@ const AmountStep = ({ game, selectedAmount, onSelect }) => {
       const d = Math.floor(diff / (1000 * 60 * 60 * 24));
       const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
 
-      setTimeLeft(`${d}d:${h}hrs:${m} minutes`);
+      setTimeLeft(`${d}d:${h}hrs:${m} min:${s} s`);
     };
 
     updateTimer();
-    const timer = setInterval(updateTimer, 60000);
+    const timer = setInterval(updateTimer, 1000);
 
     return () => clearInterval(timer);
   }, [game.id]);

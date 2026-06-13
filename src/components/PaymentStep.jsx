@@ -36,9 +36,27 @@ const PaymentStep = ({ methods, selectedId, onSelect, selectedAmount, getPrice }
               <div className="flex flex-col">
                 <span className="text-[14px] font-semibold text-gray-900">{m.name}</span>
                 {currentPrice && currentPrice !== 'N/A' && (
-                  <span className="text-[#d92027] text-[13px] font-bold mt-0.5">
-                    Pay ₹{currentPrice}
-                  </span>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-[#d92027] text-[13px] font-bold">
+                      ₹{currentPrice}
+                    </span>
+                    {(() => {
+                      const originalPrices = {
+                        40: 80,
+                        125: 250,
+                        360: 400,
+                        720: 800,
+                        1440: 1600,
+                        3600: 4000
+                      };
+                      const original = originalPrices[currentPrice];
+                      return original ? (
+                        <span className="text-gray-400 text-[11px] line-through font-medium">
+                          ₹{original}
+                        </span>
+                      ) : null;
+                    })()}
+                  </div>
                 )}
               </div>
               {m.promo && (
