@@ -20,6 +20,9 @@ import {
   AlertDialogTitle,
 } from "../components/ui/alert-dialog";
 
+import { QRCodeSVG } from 'qrcode.react';
+import { Input } from '../components/ui/input';
+
 const Home = () => {
   const [selectedGameId, setSelectedGameId] = useState('shell');
   const [selectedAmount, setSelectedAmount] = useState(null);
@@ -31,6 +34,8 @@ const Home = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showUPIModal, setShowUPIModal] = useState(false);
+  const [utr, setUtr] = useState('');
   const { toast } = useToast();
 
   const game = useMemo(
@@ -78,33 +83,29 @@ const Home = () => {
       toast({ title: 'Select payment', description: 'Please choose a payment method.' });
       return;
     }
-    handleRazorpay();
+
+    // Default to UPI for all payments for now since it's the fastest live method
+    setShowUPIModal(true);
   };
 
-  const handleRazorpay = () => {
+  const getUPILink = () => {
     const amountINR = getINRPrice(selectedAmount);
-    if (amountINR === 'N/A') return;
+    const upiId = process.env.REACT_APP_UPI_ID || 'nithesw5-1@okhdfcbank';
+    const name = process.env.REACT_APP_UPI_NAME || 'Garena Store';
+    const identifier = game.id === 'freefire' ? playerId : username;
+    const note = `Topup ${selectedAmount} ${game.pointLabel} for ${identifier}`;
+    
+    return `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${amountINR}&cu=INR&tn=${encodeURIComponent(note)}`;
+  };
 
-    const options = {
-      key: "rzp_test_T0ldMdw8kZ28UC",
-      amount: amountINR * 100, // Amount in paise
-      currency: "INR",
-      name: "Garena Store",
-      image: "/Garena-Icon-Logo.png",
-      description: `${selectedAmount} ${game.pointLabel} Top-up for ${game.id === 'freefire' ? playerId : username}`,
-      handler: function (response) {
-        setShowSuccess(true);
-      },
-      prefill: {
-        name: game.id === 'freefire' ? playerId : username,
-      },
-      theme: {
-        color: "#d92027",
-      },
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.open();
+  const handleVerifyUTR = () => {
+    if (utr.length < 12) {
+      toast({ title: 'Invalid UTR', description: 'Please enter a valid 12-digit Transaction ID.' });
+      return;
+    }
+    setShowUPIModal(false);
+    setShowSuccess(true);
+    // In a real app, you'd send the UTR to your backend for verification
   };
 
   return (
@@ -158,6 +159,46 @@ const Home = () => {
           </div>
         </div>
       </main>
+
+      <AlertDialog open={showUPIModal} onOpenChange={setShowUPIModal}>
+        <AlertDialogContent className="max-w-[400px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold flex flex-col items-center gap-2">
+              <span className="text-[#d92027]">Scan to Pay</span>
+              <span className="text-2xl font-black text-gray-900">₹{getINRPrice(selectedAmount)}</span>
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center pt-2">
+              <div className="bg-white p-4 rounded-xl border-2 border-gray-100 inline-block mb-4">
+                <QRCodeSVG value={getUPILink()} size={200} level="H" />
+              </div>
+              <p className="text-sm text-gray-500 mb-4">
+                Scan this QR using PhonePe, Google Pay, or Paytm to complete your top-up.
+              </p>
+              <div className="space-y-3 text-left">
+                <label className="text-[13px] font-bold text-gray-700 uppercase">Enter Transaction ID (UTR)</label>
+                <Input 
+                  placeholder="12 Digit Transaction ID" 
+                  value={utr}
+                  onChange={(e) => setUtr(e.target.value.replace(/[^0-9]/g, ''))}
+                  maxLength={12}
+                  className="h-12 border-gray-200 focus:border-[#d92027] focus:ring-[#d92027]"
+                />
+                <p className="text-[11px] text-gray-400 italic">
+                  Find this 12-digit number in your payment app history.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6">
+            <Button 
+              onClick={handleVerifyUTR}
+              className="bg-[#d92027] hover:bg-[#b81a20] h-11 px-8 font-bold w-full"
+            >
+              Verify & Complete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={showSuccess} onOpenChange={setShowSuccess}>
         <AlertDialogContent className="max-w-[400px]">
