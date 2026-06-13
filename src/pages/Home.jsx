@@ -212,7 +212,7 @@ const Home = () => {
               Purchase Complete!
             </AlertDialogTitle>
             <AlertDialogDescription className="pt-4 text-gray-900 font-medium leading-relaxed">
-              {selectedAmount} {game.pointLabel} will be sent to you in game mail for account : <span className="text-[#d92027] font-bold">{game.id === 'freefire' ? playerId : username}</span>
+              {selectedAmount} {game.pointLabel} will be sent to your in-game mail | Game uid : <span className="text-[#d92027] font-bold">{game.id === 'freefire' ? playerId : username}</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-6">
