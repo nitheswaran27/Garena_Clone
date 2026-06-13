@@ -20,7 +20,6 @@ import {
   AlertDialogTitle,
 } from "../components/ui/alert-dialog";
 
-import { QRCodeSVG } from 'qrcode.react';
 import { Input } from '../components/ui/input';
 
 const Home = () => {
@@ -169,7 +168,11 @@ const Home = () => {
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center pt-2">
               <div className="bg-white p-4 rounded-xl border-2 border-gray-100 inline-block mb-4">
-                <QRCodeSVG value={getUPILink()} size={200} level="H" />
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getUPILink())}`} 
+                  alt="Payment QR Code"
+                  className="w-[200px] h-[200px]"
+                />
               </div>
               <p className="text-sm text-gray-500 mb-4">
                 Scan this QR using PhonePe, Google Pay, or Paytm to complete your top-up.
