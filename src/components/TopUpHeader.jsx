@@ -6,15 +6,12 @@ const TopUpHeader = ({ game }) => {
 
   if (isFreeFire) {
     return (
-      <div className="relative rounded-xl overflow-hidden shadow-md h-[108px] w-full">
-        <picture>
-          <source media="(max-width: 640px)" srcSet="/free-fire-banner-mobile.png" />
-          <img 
-            src="/free-fire-banner.png" 
-            alt="Free Fire Banner" 
-            className="h-full w-full object-cover"
-          />
-        </picture>
+      <div className="relative rounded-xl overflow-hidden shadow-md w-full">
+        <img 
+          src="/free-fire-banner.png" 
+          alt="Free Fire Banner" 
+          className="w-full h-auto block"
+        />
       </div>
     );
   }
